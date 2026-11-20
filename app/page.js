@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useMemo, useState, useCallback } from "react";
 
-const REFRESH_MS = 5 * 60 * 1000; // poll every 5 minutes
+const REFRESH_MS = 15 * 60 * 1000; // baked data rebuilds hourly via GitHub Actions; poll occasionally for a newer build
 const WHERE = ["Remote · India", "Hybrid · Bengaluru", "Remote · Anywhere", "On-site · Bengaluru"];
 const LEVELS = ["APM", "PM", "Senior PM"];
 const AGE = { "24h": 1, "7 days": 7, "30 days": 30, Any: 9999 };
@@ -34,7 +34,7 @@ export default function Page() {
   const load = useCallback(async () => {
     setBusy(true);
     try {
-      const r = await fetch("/api/jobs");
+      const r = await fetch("data/jobs.json");
       if (!r.ok) throw new Error("Scan failed (" + r.status + ")");
       setData(await r.json()); setErr("");
     } catch (e) { setErr(e.message + ". Showing the last scan."); }
@@ -90,7 +90,7 @@ export default function Page() {
       </header>
 
       <h2>{data ? `${data.jobs.length} APM & PM roles matched to you` : "Scanning live sources…"}</h2>
-      <p className="lede">Pulled live from global remote boards and company career pages. Ranked by location priority, pay, freshness and resume fit. Refreshes automatically every 5 minutes.
+      <p className="lede">Pulled from global remote boards and company career pages. Ranked by location priority, pay, freshness and resume fit. Data rebuilds automatically every hour.
         {" "}<button className="btn" onClick={load} disabled={busy}>{busy ? "Refreshing…" : "Refresh now"}</button></p>
       {err && <p className="err">{err}</p>}
 
@@ -166,4 +166,4 @@ export default function Page() {
       </div>
     </main>
   );
-}
+              }
